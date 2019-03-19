@@ -1,0 +1,9 @@
+CMakeCache.txt
+CMakeFiles/
+CPackConfig.cmake
+CPackSourceConfig.cmake
+Makefile
+nickname
+cmake_install.cmake
+libterminator.a
+
