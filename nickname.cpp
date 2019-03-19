@@ -13,6 +13,23 @@ class node
 //	node& operator[](const std::string &index) const { return nexts[index]; }
 //	node& operator[](const char *index) const { return (*this)[std::string(index)]; }
 
+	auto operator[](const char *index) const { return (*this)[std::string(index)]; }
+
+	auto operator[](const std::string &str) const {
+		auto pos = data.find_first_not_of(str);
+		if ((pos == std::string::npos) && (str.size() == data.size()))
+		;
+		if (pos == 0)
+		{
+			// somehow create a new node
+		}
+		std::string str_index(str, pos, );
+		for (const auto &a : nexts) {
+			std::string::size_type p;
+			std::tie(, p) = a[name];	// recursion
+		}
+		return std::make_tuple(nexts[str], pos);
+	}
 
 public:
 	node(const std::string &s) : data(s), is_end(false) {}
@@ -31,14 +48,10 @@ public:
 		for (auto &a : nexts) {
 			auto pos = a.data.find_first_not_of(name);
 
-			std::cout << "find: \"" << a.data << "\" in \"" << name << "\"" << std::endl;
+			std::cout << "find: \"" << name << "\" in \"" << a.data << "\"" << std::endl;
 			if (pos == std::string::npos) {
 				std::cout << "strings are same: go deeper" << std::endl;
 				return;
-			}
-			else if (pos == 0) {
-				std::cout << "different strings: add new" << std::endl;
-				nexts.emplace(name);
 			}
 			else {
 				std::cout << "pos = " << pos << ": split string" << std::endl;
