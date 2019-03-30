@@ -8,28 +8,53 @@ class node
 {
 	std::string data;
 	bool is_end;
-	std::set<node> nexts;
+	std::shared_ptr<std::set<node>> nexts;
 
 //	node& operator[](const std::string &index) const { return nexts[index]; }
 //	node& operator[](const char *index) const { return (*this)[std::string(index)]; }
 
-	auto operator[](const char *index) const { return (*this)[std::string(index)]; }
-
-	auto operator[](const std::string &str) const {
+	/*
+	auto insert(const char *str) const {
+		if (0 == data.size())
+			return *this;
 		auto pos = data.find_first_not_of(str);
-		if ((pos == std::string::npos) && (str.size() == data.size()))
-		;
-		if (pos == 0)
-		{
-			// somehow create a new node
+		if (pos != std::string::npos)
+			return *this;
+		if (nexts.empty())
+			nexts.emplace("");
+		for (auto &a : nexts) {
+			auto b = a[str + pos];
+			if (b != nullptr)
+				return;
 		}
-		std::string str_index(str, pos, );
-		for (const auto &a : nexts) {
-			std::string::size_type p;
-			std::tie(, p) = a[name];	// recursion
-		}
-		return std::make_tuple(nexts[str], pos);
+		return nullptr;
 	}
+*/
+
+
+	void insert(size_t pos, const char *str)
+	{
+		std::string p{};
+
+	}
+
+
+	auto add(const char *str) const
+	{
+		auto pos = data.find_first_not_of(str);
+		if (pos != std::string::npos) {
+			;
+			return this;
+		}
+
+		for (const auto &a : *nexts) {
+			if (a.data[0] == str[pos])
+				return a.add(str + pos);
+		}
+		return this;
+	}
+
+
 
 public:
 	node(const std::string &s) : data(s), is_end(false) {}
@@ -58,8 +83,6 @@ public:
 			}
 		}
 	}
-
-
 };
 
 int main(int argc, char ** argv)
