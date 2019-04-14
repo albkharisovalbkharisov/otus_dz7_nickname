@@ -8,7 +8,7 @@ class node
 {
 	std::string data;
 	bool is_end;
-	std::shared_ptr<std::set<node>> nexts;
+	std::unique_ptr<std::set<node>> nexts;
 
 //	node& operator[](const std::string &index) const { return nexts[index]; }
 //	node& operator[](const char *index) const { return (*this)[std::string(index)]; }
@@ -34,7 +34,26 @@ class node
 
 	void insert(size_t pos, const char *str)
 	{
-		std::string p{};
+		if ((pos == data.size()) && (strlen(str) == 0)) {
+			is_end = true;
+			return;
+		}
+
+		if (pos == data.size()) {
+			node n{str};
+
+
+
+
+
+
+		} else {
+			std::string p{data.c_str, pos};
+			data.erase(pos);
+			n.nexts = nexts;
+			nexts = new decltype(*nexts);
+			nexts.insert();
+		}
 
 	}
 
@@ -43,7 +62,7 @@ class node
 	{
 		auto pos = data.find_first_not_of(str);
 		if (pos != std::string::npos) {
-			;
+			insert(pos, str + pos);
 			return this;
 		}
 
@@ -58,7 +77,6 @@ class node
 
 public:
 	node(const std::string &s) : data(s), is_end(false) {}
-//	node(void) : data(""), is_end(false) {}
 	node(void) = default;
 	bool operator<(const node& n) const { return data < n.data; }
 	bool operator!=(const node& n) const { return data != n.data; }
