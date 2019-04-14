@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include <set>
+#include <vector>
 #include <typeinfo>
 #include <memory>
 #include <string.h>
@@ -10,45 +10,22 @@ class node
 {
 	std::string data;
 	bool is_end;
-	std::unique_ptr<std::set<node>> nexts;
+	std::unique_ptr<std::vector<node>> nexts;
 
 	void insert(std::string::size_type pos, const char *str);
 
 public:
-	node(const std::string &s) : data(s), is_end(false) {}
-	node(void) = default;
+	node(const std::string &s)	: data(s), is_end(false), nexts(std::make_unique<std::vector<node>>()) {}
+	node(const char *s)		: data(s), is_end(false), nexts(std::make_unique<std::vector<node>>()) {}
+	node(void)			: data(),  is_end(false), nexts(std::make_unique<std::vector<node>>()) {}
 	bool operator<(const node& n) const { return data < n.data; }
 	bool operator!=(const node& n) const { return data != n.data; }
 	void add(const char *str);
-
-#if 0
-	void add(const std::string &name)
-	{
-		if (nexts.empty()) {
-			std::cout << "data = " << data << " | " << name << std::endl;
-			nexts.emplace(name);
-			return;
-		}
-		for (auto &a : nexts) {
-			auto pos = a.data.find_first_not_of(name);
-
-			std::cout << "find: \"" << name << "\" in \"" << a.data << "\"" << std::endl;
-			if (pos == std::string::npos) {
-				std::cout << "strings are same: go deeper" << std::endl;
-				return;
-			}
-			else {
-				std::cout << "pos = " << pos << ": split string" << std::endl;
-			}
-		}
-	}
-#endif	// 0
 };
 
 
 void node::insert(std::string::size_type pos, const char *str)
 {
-#if 1
 	std::cout << "insert: \"" << data << "\", pos = " << pos << ", str = " << str << std::endl;
 	if (pos == std::string::npos) {
 		if (strlen(str) == 0) {
@@ -56,31 +33,25 @@ void node::insert(std::string::size_type pos, const char *str)
 			is_end = true;
 		} else {
 			std::cout << "case 2" << std::endl;
-			nexts->emplace(str);
+			nexts->emplace_back(str);
 		}
 	} else {
 		std::cout << "case 3" << std::endl;
 		node tail{std::string{data.c_str(), pos}};
 		data.erase(pos);
 
-		tail.nexts = std::move(nexts);		// move unique_ptr
-//		nexts = std::make_unique<decltype(*nexts)>();	// new decltype(*nexts);
-		nexts.swap(std::make_unique<decltype(*nexts)>());	// new decltype(*nexts);
+		tail.nexts = std::move(nexts);
+		nexts = std::make_unique<std::vector<node>>();
 		tail.is_end = is_end;
 		is_end = false;
-		nexts->emplace(str);
-		nexts->insert(std::move(tail));		// nexts->emplace(tail);
+		nexts->emplace_back(str);
+		nexts->emplace_back(std::move(tail));
 	}
-#endif // 0
 }
 
 
 void node::add(const char *str)
 {
-#if 0
-	auto pos = std::string("123").find_first_not_of(str);
-	std::cout << "pos = " << pos << std::endl;
-#else
 	std::cout << "add: \"" << str << "\"" << std::endl;
 	auto pos = data.find_first_not_of(str);
 	if (pos != std::string::npos) {
@@ -88,24 +59,27 @@ void node::add(const char *str)
 		return;
 	}
 
+	std::cout << "nexts->size = " << nexts->size() << std::endl;
 	str += data.size();
+	std::cout << "str += data.size()" << std::endl;
 
-	for (const auto &a : *nexts) {
+	for (node &a : (*nexts)) {
+		std::cout << "next..." << std::endl;
 		if (a.data[0] == str[0]) {	// quick way to peep is this string are candidate to match string
 			a.add(str);
 			return;		// all strings starts from different letters, so stop searching
 		}
 	}
+	std::cout << "before insert(pos, str)" << std::endl;
 	insert(pos, str);
-#endif	// 0
+	std::cout << "after insert(pos, str)" << std::endl;
 }
-
 
 
 int main(int argc, char ** argv)
 {
 	(void) argc, (void) argv;
-	node head;
+	node head{};
 	for(std::string line; std::getline(std::cin, line); ) {
 		head.add(line.c_str());
 	}
