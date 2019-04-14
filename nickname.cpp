@@ -46,33 +46,37 @@ public:
 
 void node::insert(std::string::size_type pos, const char *str)
 {
+#if 0
 	std::cout << "insert: \"" << data << "\", pos = " << pos << ", str = " << str << std::endl;
 	if (pos == std::string::npos) {
 		
-	} else if ((pos == data.size()) && (strlen(str) == 0)) {
-		std::cout << "case 1" << std::endl;
-		is_end = true;
 	} else if (pos == data.size()) {
-		std::cout << "case 2" << std::endl;
-		nexts->emplace(str);
+		if (strlen(str) == 0) {
+			std::cout << "case 1" << std::endl;
+			is_end = true;
+		} else {
+			std::cout << "case 2" << std::endl;
+			nexts->emplace(str);
+		}
 	} else {
 		std::cout << "case 3" << std::endl;
 		node tail{std::string{data.c_str, pos}};
 		data.erase(pos);
 
 		tail.nexts = nexts;		// move unique_ptr
-		nexts = std::make_unique();	// new decltype(*nexts);
-		tail.is_end = true;
+		nexts = std::make_unique<decltype(*nexts)>(  );	// new decltype(*nexts);
+		tail.is_end = is_end;
 		is_end = false;
 		nexts->emplace(str);
 		nexts->insert(std::move(tail));		// nexts->emplace(tail);
 	}
-
+#endif // 0
 }
 
 
 void node::add(const char *str)
 {
+#if 0
 	std::cout << "add: \"" << str << "\"" << std::endl;
 	auto pos = data.find_first_not_of(str);
 	if (pos != std::string::npos) {
@@ -89,6 +93,7 @@ void node::add(const char *str)
 		}
 	}
 	insert(pos, str);
+#endif	// 0
 }
 
 
