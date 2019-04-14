@@ -3,6 +3,8 @@
 #include <string>
 #include <set>
 #include <typeinfo>
+#include <memory>
+#include <string.h>
 
 class node
 {
@@ -10,14 +12,14 @@ class node
 	bool is_end;
 	std::unique_ptr<std::set<node>> nexts;
 
-	void node::insert(std::string::size_type pos, const char *str);
+	void insert(std::string::size_type pos, const char *str);
 
 public:
 	node(const std::string &s) : data(s), is_end(false) {}
 	node(void) = default;
 	bool operator<(const node& n) const { return data < n.data; }
 	bool operator!=(const node& n) const { return data != n.data; }
-	void node::add(const char *str);
+	void add(const char *str);
 
 #if 0
 	void add(const std::string &name)
@@ -46,11 +48,9 @@ public:
 
 void node::insert(std::string::size_type pos, const char *str)
 {
-#if 0
+#if 1
 	std::cout << "insert: \"" << data << "\", pos = " << pos << ", str = " << str << std::endl;
 	if (pos == std::string::npos) {
-		
-	} else if (pos == data.size()) {
 		if (strlen(str) == 0) {
 			std::cout << "case 1" << std::endl;
 			is_end = true;
@@ -60,11 +60,12 @@ void node::insert(std::string::size_type pos, const char *str)
 		}
 	} else {
 		std::cout << "case 3" << std::endl;
-		node tail{std::string{data.c_str, pos}};
+		node tail{std::string{data.c_str(), pos}};
 		data.erase(pos);
 
-		tail.nexts = nexts;		// move unique_ptr
-		nexts = std::make_unique<decltype(*nexts)>(  );	// new decltype(*nexts);
+		tail.nexts = std::move(nexts);		// move unique_ptr
+//		nexts = std::make_unique<decltype(*nexts)>();	// new decltype(*nexts);
+		nexts.swap(std::make_unique<decltype(*nexts)>());	// new decltype(*nexts);
 		tail.is_end = is_end;
 		is_end = false;
 		nexts->emplace(str);
@@ -77,6 +78,9 @@ void node::insert(std::string::size_type pos, const char *str)
 void node::add(const char *str)
 {
 #if 0
+	auto pos = std::string("123").find_first_not_of(str);
+	std::cout << "pos = " << pos << std::endl;
+#else
 	std::cout << "add: \"" << str << "\"" << std::endl;
 	auto pos = data.find_first_not_of(str);
 	if (pos != std::string::npos) {
@@ -103,7 +107,7 @@ int main(int argc, char ** argv)
 	(void) argc, (void) argv;
 	node head;
 	for(std::string line; std::getline(std::cin, line); ) {
-		head.add(line);
+		head.add(line.c_str());
 	}
 
 	return 0;
