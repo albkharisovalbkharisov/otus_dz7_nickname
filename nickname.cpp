@@ -4,6 +4,7 @@
 #include <vector>
 #include <typeinfo>
 #include <memory>
+#include <forward_list>
 #include <string.h>
 
 class node
@@ -21,6 +22,7 @@ public:
 	bool operator<(const node& n) const { return data < n.data; }
 	bool operator!=(const node& n) const { return data != n.data; }
 	void add(const char *str);
+	void show_all(void);
 };
 
 
@@ -55,26 +57,43 @@ void node::add(const char *str)
 	std::cout << "add: \"" << str << "\"" << std::endl;
 	auto pos = data.find_first_not_of(str);
 	if (pos != std::string::npos) {
+		std::cout << "stop searching1" << std::endl;
 		insert(pos, str + pos);
 		return;
 	}
 
 	std::cout << "nexts->size = " << nexts->size() << std::endl;
 	str += data.size();
-	std::cout << "str += data.size()" << std::endl;
 
-	for (node &a : (*nexts)) {
-		std::cout << "next..." << std::endl;
-		if (a.data[0] == str[0]) {	// quick way to peep is this string are candidate to match string
+	for (node &a : *nexts) {
+		std::cout << "compare to... \"" << a.data << "\"" << std::endl;
+		if (a.data[0] == str[0]) {	// quick way to peep is this string candidate to match
+			std::cout << "go deeper..." << std::endl;
 			a.add(str);
 			return;		// all strings starts from different letters, so stop searching
 		}
 	}
-	std::cout << "before insert(pos, str)" << std::endl;
+	std::cout << "stop searching1" << std::endl;
 	insert(pos, str);
-	std::cout << "after insert(pos, str)" << std::endl;
 }
 
+void node::show_all(void)
+{
+//	std::forward_list<std::string *> fls;
+	std::list<std::string *> fls;
+//	auto head = fls.before_begin();
+	
+	auto f = [&](node & n)
+	{
+		fls.push_back(&n.data);
+		for (auto & a : *nexts) {
+			f(a);
+		}
+		fls.erase(fls.rbegin());
+	};
+	
+	f(it, *this);
+}
 
 int main(int argc, char ** argv)
 {
