@@ -11,7 +11,7 @@ add_executable(nickname nickname.cpp)
 set_target_properties(nickname PROPERTIES
     CXX_STANDARD 14
     CXX_STANDARD_REQUIRED ON
-    COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
+    COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra;-ggdb"
     # COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra;-fsanitize=thread"
 )
 
