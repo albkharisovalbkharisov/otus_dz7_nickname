@@ -71,7 +71,7 @@ void node::add(const char *str)
 	std::cout << "add: \"" << str << "\"" << std::endl;
 	auto pos = data.find_first_not_of(str);
 	if (pos != std::string::npos) {
-		std::cout << "stop searching1" << std::endl;
+		std::cout << "stop searching1, lets insert \"" << str << "\" into \"" << data << "\", pos=" << pos << std::endl;
 		insert(pos, str + pos);
 		return;
 	}
