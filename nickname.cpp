@@ -1,7 +1,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-//#include <vector>
 #include <unordered_map>
 #include <typeinfo>
 #include <memory>
@@ -44,7 +43,6 @@ class node
 
 	std::string data;
 	bool is_end;
-//	std::unique_ptr<std::vector<node>> nexts;
 	std::unique_ptr<charind> nexts;
 
 	void insert(std::string::size_type pos, const char *str);
@@ -101,15 +99,6 @@ void node::add(const char *str)
 
 	str += data.size();
 
-//	nexts->at(str[0]);
-//	if (nexts->count(str[0]) > 0)
-
-//	for (node &a : *nexts) {
-//		if (a.data[0] == str[0]) {	// quick way to peep is this string candidate to match
-//			a.add(str);
-//			return;		// all strings starts from different letters, so stop searching
-//		}
-//	}
 	auto it = nexts->find(str[0]);
 	if (it != nexts->end()) {
 		it->second.add(str);
