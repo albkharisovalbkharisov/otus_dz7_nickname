@@ -134,20 +134,15 @@ void node::show_all(void)
 
 void node::help(void)
 {
-	static int tabs = 0;
-	for (int i = 0; i < tabs; ++i) std::cout << "\t";
-	std::cout << "data: \"" << data << "\"" << std::endl;
-	for (int i = 0; i < tabs; ++i) std::cout << "\t";
-	std::cout << "is_end: " << is_end << std::endl;
+	static std::string offset{};
+	std::cout << offset << "\"" << data << "\"" << (is_end ? "$" : "") << std::endl;
 
-	std::cout << "{" << std::endl;
-	++tabs;
+	offset += "  ";
 	for (auto &a : *nexts) {
-		std::cout << "[0] = " << a.first << std::endl;
 		a.second.help();
 	}
-	--tabs;
-	std::cout << "}" << std::endl;
+	offset.pop_back();
+	offset.pop_back();
 }
 
 
