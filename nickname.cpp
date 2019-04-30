@@ -1,7 +1,8 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include <vector>
+//#include <vector>
+#include <unordered_map>
 #include <typeinfo>
 #include <memory>
 #include <forward_list>
@@ -39,16 +40,19 @@ static auto correct_compare(const std::string &s1, const char *s2)
 
 class node
 {
+	using charind = std::unordered_map<char, node>;
+
 	std::string data;
 	bool is_end;
-	std::unique_ptr<std::vector<node>> nexts;
+//	std::unique_ptr<std::vector<node>> nexts;
+	std::unique_ptr<charind> nexts;
 
 	void insert(std::string::size_type pos, const char *str);
 
 public:
-	node(const std::string &s)	: data(s), is_end(true), nexts(std::make_unique<std::vector<node>>()) {}
-	node(const char *s)		: data(s), is_end(true), nexts(std::make_unique<std::vector<node>>()) {}
-	node(void)			: data(),  is_end(false), nexts(std::make_unique<std::vector<node>>()) {}
+	node(const std::string &s)	: data(s), is_end(true), nexts(std::make_unique<charind>()) {}
+	node(const char *s)		: data(s), is_end(true), nexts(std::make_unique<charind>()) {}
+	node(void)			: data(),  is_end(false), nexts(std::make_unique<charind>()) {}
 	bool operator<(const node& n) const { return data < n.data; }
 	bool operator!=(const node& n) const { return data != n.data; }
 	void add(const char *str);
@@ -66,7 +70,7 @@ void node::insert(std::string::size_type pos, const char *str)
 		} else if (strlen(str) == 0) {
 			is_end = true;
 		} else {
-			nexts->emplace_back(str);
+			nexts->emplace(str[0], str);
 			is_end = true;
 		}
 	} else {
@@ -74,14 +78,13 @@ void node::insert(std::string::size_type pos, const char *str)
 		data.erase(pos);
 
 		tail.nexts = std::move(nexts);
-		nexts = std::make_unique<std::vector<node>>();
+		nexts = std::make_unique<charind>();
 		tail.is_end = is_end;
-		nexts->emplace_back(std::move(tail));
+		nexts->emplace(tail.data[0], std::move(tail));
 		if (strlen(str) > 0) {
-			nexts->emplace_back(str);
+			nexts->emplace(str[0], str);
 			is_end = false;
-		}
-		else {
+		} else {
 			is_end = true;
 		}
 	}
@@ -98,14 +101,23 @@ void node::add(const char *str)
 
 	str += data.size();
 
-	for (node &a : *nexts) {
-		if (a.data[0] == str[0]) {	// quick way to peep is this string candidate to match
-			a.add(str);
-			return;		// all strings starts from different letters, so stop searching
-		}
+//	nexts->at(str[0]);
+//	if (nexts->count(str[0]) > 0)
+
+//	for (node &a : *nexts) {
+//		if (a.data[0] == str[0]) {	// quick way to peep is this string candidate to match
+//			a.add(str);
+//			return;		// all strings starts from different letters, so stop searching
+//		}
+//	}
+	auto it = nexts->find(str[0]);
+	if (it != nexts->end()) {
+		it->second.add(str);
+		return;
 	}
 	insert(pos, str);
 }
+
 
 void node::show_all(void)
 {
@@ -122,13 +134,14 @@ void node::show_all(void)
 
 		fls.push_back(&n.data);
 		for (auto& a : *(n.nexts)) {
-			f(a);
+			f(a.second);
 		}
 		fls.pop_back();
 	};
 
 	f(*this);
 }
+
 
 void node::help(void)
 {
@@ -141,7 +154,8 @@ void node::help(void)
 	std::cout << "{" << std::endl;
 	++tabs;
 	for (auto &a : *nexts) {
-		a.help();
+		std::cout << "[0] = " << a.first << std::endl;
+		a.second.help();
 	}
 	--tabs;
 	std::cout << "}" << std::endl;
@@ -156,8 +170,8 @@ int main(int argc, char ** argv)
 	for(std::string line; std::getline(std::cin, line); ) {
 		head.add(line.c_str());
 		std::cout << "============= tree ===========" << std::endl;
-		head.show_all();
-		std::cout << "=======================" << std::endl;
+//		head.show_all();
+//		std::cout << "=======================" << std::endl;
 		head.help();
 		std::cout << "=======================" << std::endl;
 	}
