@@ -10,6 +10,33 @@
 #include <functional>
 
 
+// Works for C-style strings.
+
+
+// First I thought find_first_if_not() compares 2 strings
+// and returns first mismatch, but I was surprised it dont.
+// Now I'm in train, there are no internet, so I writing my
+// own bycycle. Isn't it what training courses is all about?
+//
+// returns	npos if no different chars found
+//		number of first mismatch character
+//
+static auto correct_compare(const std::string &s1, const char *s2)
+{
+	std::string::size_type i = 0;
+
+	for ( ; (i != s1.size()) && s2[i]; ++i) {
+		if (s1[i] != s2[i])
+			break;
+	}
+
+	if (i == s1.size())
+		return std::string::npos;
+
+	return i;
+}
+
+
 class node
 {
 	std::string data;
@@ -32,22 +59,17 @@ public:
 
 void node::insert(std::string::size_type pos, const char *str)
 {
-	std::cout << "insert: \"" << data << "\", pos = " << pos << ", str = \"" << str << "\"" << std::endl;
 	if (pos == std::string::npos) {
 		if (data.empty() && !is_end) {
-			std::cout << "case 0" << std::endl;
 			data = str;
 			is_end = true;
 		} else if (strlen(str) == 0) {
-			std::cout << "case 1" << std::endl;
 			is_end = true;
 		} else {
-			std::cout << "case 2" << std::endl;
 			nexts->emplace_back(str);
 			is_end = true;
 		}
 	} else {
-		std::cout << "case 3" << std::endl;
 		node tail{std::string{data.c_str(), pos, std::string::npos}};
 		data.erase(pos);
 
@@ -68,40 +90,31 @@ void node::insert(std::string::size_type pos, const char *str)
 
 void node::add(const char *str)
 {
-	std::cout << "add: \"" << str << "\"" << std::endl;
-	auto pos = data.find_first_not_of(str);
+	auto pos = correct_compare(data, str);
 	if (pos != std::string::npos) {
-		std::cout << "stop searching1, lets insert \"" << str << "\" into \"" << data << "\", pos=" << pos << std::endl;
 		insert(pos, str + pos);
 		return;
 	}
 
-	std::cout << "nexts->size = " << nexts->size() << std::endl;
 	str += data.size();
 
 	for (node &a : *nexts) {
-		std::cout << "compare to... \"" << a.data << "\"" << std::endl;
 		if (a.data[0] == str[0]) {	// quick way to peep is this string candidate to match
-			std::cout << "go deeper..." << std::endl;
 			a.add(str);
 			return;		// all strings starts from different letters, so stop searching
 		}
 	}
-	std::cout << "stop searching1" << std::endl;
 	insert(pos, str);
 }
 
 void node::show_all(void)
 {
-#if 1
 	std::list<std::string *> fls;
 
-	std::function<void(node &)> f = [&fls, &f, this] (node &n) {
-		std::cout << "enter" << std::endl;
-		if (is_end) {
-			std::cout << "is_end true" << std::endl;
+	std::function<void(node &)> f = [&fls, &f] (node &n) {
+		if (n.is_end) {
 			for (auto a : fls)
-				std::cout << *a << '\n';
+				std::cout << *a;
 			std::cout << n.data << std::endl;
 		}
 		if (n.nexts->empty())
@@ -112,11 +125,9 @@ void node::show_all(void)
 			f(a);
 		}
 		fls.pop_back();
-		std::cout << "exit" << std::endl;
 	};
 
 	f(*this);
-#endif	// 0
 }
 
 void node::help(void)
@@ -136,14 +147,17 @@ void node::help(void)
 	std::cout << "}" << std::endl;
 }
 
+
 int main(int argc, char ** argv)
 {
 	(void) argc, (void) argv;
+
 	node head{};
 	for(std::string line; std::getline(std::cin, line); ) {
 		head.add(line.c_str());
 		std::cout << "============= tree ===========" << std::endl;
-//		head.show_all();
+		head.show_all();
+		std::cout << "=======================" << std::endl;
 		head.help();
 		std::cout << "=======================" << std::endl;
 	}
