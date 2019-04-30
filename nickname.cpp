@@ -62,16 +62,17 @@ public:
 void node::insert(std::string::size_type pos, const char *str)
 {
 	if (pos == std::string::npos) {
-		if (data.empty() && !is_end) {
+		std::cout << "******npos" << std::endl;
+		if (data.empty() && !is_end && nexts->empty()) {
 			data = str;
 			is_end = true;
 		} else if (strlen(str) == 0) {
 			is_end = true;
 		} else {
 			nexts->emplace(str[0], str);
-			is_end = true;
 		}
 	} else {
+		std::cout << "******index" << std::endl;
 		node tail{std::string{data.c_str(), pos, std::string::npos}};
 		data.erase(pos);
 
