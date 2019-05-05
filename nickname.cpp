@@ -46,6 +46,7 @@ class node
 	std::unique_ptr<charind> nexts;
 
 	void insert(std::string::size_type pos, const char *str);
+	void print_accumulated(const std::list<std::string *> &fls);
 
 public:
 	node(const std::string &s)	: data(s), is_end(true), nexts(std::make_unique<charind>()) {}
@@ -106,40 +107,35 @@ void node::add(const char *str)
 	insert(pos, str);
 }
 
-//void node::print_accumulated(const std::list<std::string *> &fls)
-//{
-//
-//}
+void node::print_accumulated(const std::list<std::string *> &fls)
+{
+	for (auto a : fls)
+		std::cout << *a;
+	std::cout << data;
+	std::cout << " ";
+
+	for (auto a : fls)
+		std::cout << *a;
+	if (nexts->empty())
+		std::cout << data[0] << std::endl;
+	else
+		std::cout << data << std::endl;
+}
 
 void node::show_all(void)
 {
 	std::list<std::string *> fls;
 
 	std::function<void(node &)> f = [&fls, &f] (node &n) {
-		if (n.is_end) {
-//			print_accunulated(&fls);
-			std::cout << "\"";
-			for (auto a : fls)
-				std::cout << *a;
-			std::cout << n.data << "\" ";
+		if (n.is_end)
+			n.print_accumulated(fls);
 
-			std::cout << "\"";
-			for (auto a : fls)
-				std::cout << *a;
-//			std::cout << n.nexts->empty() ? n.data[0] : n.data;
-			if (n.nexts->empty())
-				std::cout << n.data[0];
-			else
-				std::cout << n.data;
-			std::cout << "\"" << std::endl;
-		}
 		if (n.nexts->empty())
 			return;
 
 		fls.push_back(&n.data);
-		for (auto& a : *(n.nexts)) {
+		for (auto& a : *(n.nexts))
 			f(a.second);
-		}
 		fls.pop_back();
 	};
 
