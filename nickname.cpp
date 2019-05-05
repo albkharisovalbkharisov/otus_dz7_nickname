@@ -19,6 +19,8 @@
 // Now I'm in train, there are no internet, so I writing my
 // own bycycle. Isn't it what training courses is all about?
 //
+// Seems "std::mismatch" can do the same.
+//
 // returns	npos if no different chars found
 //		number of first mismatch character
 //
@@ -56,8 +58,8 @@ public:
 	bool operator<(const node& n) const { return data < n.data; }
 	bool operator!=(const node& n) const { return data != n.data; }
 	void add(const char *str);
-	void show_all(void);
-	void help(void);
+	void show_elements(void);
+	void show_structure(void);
 };
 
 
@@ -123,7 +125,7 @@ void node::print_accumulated(const std::list<std::string *> &fls)
 		std::cout << data << std::endl;
 }
 
-void node::show_all(void)
+void node::show_elements(void)
 {
 	std::list<std::string *> fls;
 
@@ -144,7 +146,7 @@ void node::show_all(void)
 }
 
 
-void node::help(void)
+void node::show_structure(void)
 {
 	static std::string offset{};
 	std::cout << offset << "\"" << data << "\"" << (is_end ? "$" : "") << std::endl;
@@ -167,8 +169,8 @@ int main(int argc, char ** argv)
 		head.add(line.c_str());
 	}
 
-	head.help();
-	head.show_all();
+	head.show_structure();
+	head.show_elements();
 
 	return 0;
 }
