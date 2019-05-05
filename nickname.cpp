@@ -1,7 +1,8 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include <unordered_map>
+//#include <unordered_map>
+#include <map>
 #include <typeinfo>
 #include <memory>
 #include <forward_list>
@@ -39,7 +40,7 @@ static auto correct_compare(const std::string &s1, const char *s2)
 
 class node
 {
-	using charind = std::unordered_map<char, node>;
+	using charind = std::map<char, node>;
 
 	std::string data;
 	bool is_end;
