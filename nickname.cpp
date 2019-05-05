@@ -62,7 +62,6 @@ public:
 void node::insert(std::string::size_type pos, const char *str)
 {
 	if (pos == std::string::npos) {
-		std::cout << "******npos" << std::endl;
 		if (data.empty() && !is_end && nexts->empty()) {
 			data = str;
 			is_end = true;
@@ -72,7 +71,6 @@ void node::insert(std::string::size_type pos, const char *str)
 			nexts->emplace(str[0], str);
 		}
 	} else {
-		std::cout << "******index" << std::endl;
 		node tail{std::string{data.c_str(), pos, std::string::npos}};
 		data.erase(pos);
 
@@ -108,6 +106,10 @@ void node::add(const char *str)
 	insert(pos, str);
 }
 
+//void node::print_accumulated(const std::list<std::string *> &fls)
+//{
+//
+//}
 
 void node::show_all(void)
 {
@@ -115,9 +117,21 @@ void node::show_all(void)
 
 	std::function<void(node &)> f = [&fls, &f] (node &n) {
 		if (n.is_end) {
+//			print_accunulated(&fls);
+			std::cout << "\"";
 			for (auto a : fls)
 				std::cout << *a;
-			std::cout << n.data << std::endl;
+			std::cout << n.data << "\" ";
+
+			std::cout << "\"";
+			for (auto a : fls)
+				std::cout << *a;
+//			std::cout << n.nexts->empty() ? n.data[0] : n.data;
+			if (n.nexts->empty())
+				std::cout << n.data[0];
+			else
+				std::cout << n.data;
+			std::cout << "\"" << std::endl;
 		}
 		if (n.nexts->empty())
 			return;
@@ -154,12 +168,10 @@ int main(int argc, char ** argv)
 	node head{};
 	for(std::string line; std::getline(std::cin, line); ) {
 		head.add(line.c_str());
-		std::cout << "============= tree ===========" << std::endl;
-//		head.show_all();
-//		std::cout << "=======================" << std::endl;
-		head.help();
-		std::cout << "=======================" << std::endl;
 	}
+
+	head.help();
+	head.show_all();
 
 	return 0;
 }
