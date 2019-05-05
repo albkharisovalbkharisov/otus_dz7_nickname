@@ -1,7 +1,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-//#include <unordered_map>
 #include <map>
 #include <typeinfo>
 #include <memory>
@@ -42,21 +41,19 @@ static auto correct_compare(const std::string &s1, const char *s2)
 
 class node
 {
-	using charind = std::map<char, node>;
+	using mcn = std::map<char, node>;
 
 	std::string data;
 	bool is_end;
-	std::unique_ptr<charind> nexts;
+	std::unique_ptr<mcn> nexts;
 
 	void insert(std::string::size_type pos, const char *str);
 	void print_accumulated(const std::list<const std::string *> &fls) const;
 
 public:
-	node(const std::string &s)	: data(s), is_end(true), nexts(std::make_unique<charind>()) {}
-	node(const char *s)		: data(s), is_end(true), nexts(std::make_unique<charind>()) {}
-	node(void)			: data(),  is_end(false), nexts(std::make_unique<charind>()) {}
-	bool operator<(const node& n) const { return data < n.data; }
-	bool operator!=(const node& n) const { return data != n.data; }
+	node(const std::string &s)	: data(s), is_end(true), nexts(std::make_unique<mcn>()) {}
+	node(const char *s)		: data(s), is_end(true), nexts(std::make_unique<mcn>()) {}
+	node(void)			: data(),  is_end(false), nexts(std::make_unique<mcn>()) {}
 	void add(const char *str);
 	void show_elements(void) const;
 	void show_structure(void) const;
@@ -79,7 +76,7 @@ void node::insert(std::string::size_type pos, const char *str)
 		data.erase(pos);
 
 		tail.nexts = std::move(nexts);
-		nexts = std::make_unique<charind>();
+		nexts = std::make_unique<mcn>();
 		tail.is_end = is_end;
 		nexts->emplace(tail.data[0], std::move(tail));
 		if (strlen(str) > 0) {
@@ -90,7 +87,6 @@ void node::insert(std::string::size_type pos, const char *str)
 		}
 	}
 }
-
 
 void node::add(const char *str)
 {
