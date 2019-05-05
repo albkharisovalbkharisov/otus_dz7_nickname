@@ -49,7 +49,7 @@ class node
 	std::unique_ptr<charind> nexts;
 
 	void insert(std::string::size_type pos, const char *str);
-	void print_accumulated(const std::list<std::string *> &fls);
+	void print_accumulated(const std::list<const std::string *> &fls) const;
 
 public:
 	node(const std::string &s)	: data(s), is_end(true), nexts(std::make_unique<charind>()) {}
@@ -58,8 +58,8 @@ public:
 	bool operator<(const node& n) const { return data < n.data; }
 	bool operator!=(const node& n) const { return data != n.data; }
 	void add(const char *str);
-	void show_elements(void);
-	void show_structure(void);
+	void show_elements(void) const;
+	void show_structure(void) const;
 };
 
 
@@ -110,7 +110,7 @@ void node::add(const char *str)
 	insert(pos, str);
 }
 
-void node::print_accumulated(const std::list<std::string *> &fls)
+void node::print_accumulated(const std::list<const std::string *> &fls) const
 {
 	for (auto a : fls)
 		std::cout << *a;
@@ -125,11 +125,11 @@ void node::print_accumulated(const std::list<std::string *> &fls)
 		std::cout << data << std::endl;
 }
 
-void node::show_elements(void)
+void node::show_elements(void) const
 {
-	std::list<std::string *> fls;
+	std::list<const std::string *> fls;
 
-	std::function<void(node &)> f = [&fls, &f] (node &n) {
+	std::function<void(const node &)> f = [&fls, &f] (const node &n) {
 		if (n.is_end)
 			n.print_accumulated(fls);
 
@@ -146,14 +146,14 @@ void node::show_elements(void)
 }
 
 
-void node::show_structure(void)
+void node::show_structure(void) const
 {
 	static std::string offset{};
 	std::cout << offset << "\"" << data << "\"" << (is_end ? "$" : "") << std::endl;
 
 	offset += "  ";
 	for (auto &a : *nexts) {
-		a.second.help();
+		a.second.show_structure();
 	}
 	offset.pop_back();
 	offset.pop_back();
